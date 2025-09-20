@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Diario Vintage</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,48,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120,119,198,0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #f4f1e8 0%, #e8dcc0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 24px,
+                    rgba(139, 69, 19, 0.1) 25px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: 
+                linear-gradient(45deg, transparent 49%, rgba(139, 69, 19, 0.03) 50%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, rgba(139, 69, 19, 0.03) 50%, transparent 51%),
+                #faf7f0;
+            border-radius: 0;
+            box-shadow: 
+                inset 0 0 50px rgba(139, 69, 19, 0.1),
+                0 0 0 1px rgba(139, 69, 19, 0.2),
+                0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+        }
+
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(160, 82, 45, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            background: 
+                linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(160, 82, 45, 0.8) 100%),
+                #8b4513;
+            color: #faf7f0;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid rgba(139, 69, 19, 0.3);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.5), transparent);
+        }
+
+        .header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .date-display {
+            background: rgba(250, 247, 240, 0.2);
+            padding: 12px 20px;
+            border-radius: 0;
+            border: 1px solid rgba(250, 247, 240, 0.3);
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-style: italic;
+            backdrop-filter: blur(5px);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            background: transparent;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(250, 247, 240, 0.7);
+            border-right: 2px solid rgba(139, 69, 19, 0.2);
+            padding: 25px;
+            backdrop-filter: blur(5px);
+        }
+
+        .sidebar-section {
+            margin-bottom: 35px;
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #8b4513;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Dancing Script', cursive;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .category-btn {
+            width: 100%;
+            background: rgba(250, 247, 240, 0.8);
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            padding: 15px 18px;
+            border-radius: 0;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Crimson Text', serif;
+            font-weight: 500;
+            color: #5d4037;
+        }
+
+        .category-btn:hover {
+            background: rgba(139, 69, 19, 0.1);
+            border-color: #8b4513;
+            transform: translateX(5px);
+        }
+
+        .category-btn.active {
+            background: rgba(139, 69, 19, 0.15);
+            color: #8b4513;
+            border-color: #8b4513;
+            font-weight: 600;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: #faf7f0;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Crimson Text', serif;
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .add-btn:hover {
+            background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 69, 19, 0.4);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: transparent;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #8b4513;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .search-box {
+            background: rgba(250, 247, 240, 0.9);
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            border-radius: 0;
+            padding: 12px 20px;
+            width: 300px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: 'Crimson Text', serif;
+            color: #5d4037;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #8b4513;
+            background: rgba(250, 247, 240, 1);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .item-card {
+            background: 
+                linear-gradient(45deg, transparent 49%, rgba(139, 69, 19, 0.02) 50%, transparent 51%),
+                rgba(250, 247, 240, 0.95);
+            border-radius: 0;
+            padding: 25px;
+            box-shadow: 
+                0 0 0 1px rgba(139, 69, 19, 0.2),
+                0 8px 16px rgba(139, 69, 19, 0.1);
+            transition: all 0.3s;
+            border-left: 4px solid #8b4513;
+            position: relative;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(139, 69, 19, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 0 0 1px rgba(139, 69, 19, 0.3),
+                0 12px 24px rgba(139, 69, 19, 0.15);
+        }
+
+        .item-card.todo {
+            border-left-color: #2e7d32;
+        }
+
+        .item-card.note {
+            border-left-color: #f57c00;
+        }
+
+        .item-card.list {
+            border-left-color: #1976d2;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #5d4037;
+            flex: 1;
+            font-family: 'Dancing Script', cursive;
+            line-height: 1.2;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: rgba(139, 69, 19, 0.1);
+            border: 1px solid rgba(139, 69, 19, 0.2);
+            padding: 8px;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            color: #8b4513;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(139, 69, 19, 0.2);
+            border-color: #8b4513;
+            transform: scale(1.1);
+        }
+
+        .item-content {
+            color: #5d4037;
+            line-height: 1.7;
+            margin-bottom: 18px;
+            font-size: 15px;
+        }
+
+        .item-content.ordered-list {
+            counter-reset: list-counter;
+        }
+
+        .item-content.ordered-list .list-item {
+            counter-increment: list-counter;
+            margin-bottom: 8px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .item-content.ordered-list .list-item::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+            color: #8b4513;
+        }
+
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #8d6e63;
+            font-style: italic;
+            border-top: 1px solid rgba(139, 69, 19, 0.1);
+            padding-top: 12px;
+        }
+
+        .priority-high {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            color: #f57c00;
+            font-weight: 600;
+        }
+
+        .priority-low {
+            color: #388e3c;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 69, 19, 0.4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: 
+                linear-gradient(45deg, transparent 49%, rgba(139, 69, 19, 0.02) 50%, transparent 51%),
+                #faf7f0;
+            border-radius: 0;
+            padding: 35px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 0 0 2px rgba(139, 69, 19, 0.3),
+                0 20px 40px rgba(139, 69, 19, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #8b4513;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #8b4513;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: scale(1.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #8b4513;
+            font-size: 15px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            border-radius: 0;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: 'Crimson Text', serif;
+            background: rgba(250, 247, 240, 0.8);
+            color: #5d4037;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b4513;
+            background: rgba(250, 247, 240, 1);
+        }
+
+        .form-textarea {
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            border-radius: 0;
+            font-size: 15px;
+            background: rgba(250, 247, 240, 0.9);
+            font-family: 'Crimson Text', serif;
+            color: #5d4037;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Crimson Text', serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: #faf7f0;
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 69, 19, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8b4513;
+            border: 2px solid rgba(139, 69, 19, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 69, 19, 0.2);
+            border-color: #8b4513;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #8d6e63;
+        }
+
+        .empty-state-icon {
+            font-size: 5rem;
+            margin-bottom: 25px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #8b4513;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #8b4513;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            color: #8d6e63;
+            opacity: 0.7;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+            }
+
+            .content-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📖 Diario Vintage</h1>
+            <div class="date-display" id="currentDate"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">📂 Categorie</div>
+                    <button class="category-btn active" data-category="all">
+                        📋 Tutto
+                    </button>
+                    <button class="category-btn" data-category="todo">
+                        ✅ Cose da Fare
+                    </button>
+                    <button class="category-btn" data-category="note">
+                        📝 Appunti
+                    </button>
+                    <button class="category-btn" data-category="list">
+                        📄 Liste Numerate
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <button class="add-btn" onclick="openModal('add')">
+                        ➕ Aggiungi Nuovo
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">📊 Statistiche</div>
+                    <div style="background: rgba(250, 247, 240, 0.8); padding: 20px; border: 1px solid rgba(139, 69, 19, 0.2); font-size: 14px;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Totale elementi:</strong> <span id="totalItems">0</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Da completare:</strong> <span id="pendingItems">0</span>
+                        </div>
+                        <div>
+                            <strong>Completati:</strong> <span id="completedItems">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-header">
+                    <h2 class="content-title" id="contentTitle">📋 Tutti gli elementi</h2>
+                    <input type="text" class="search-box" placeholder="🔍 Cerca..." id="searchInput" oninput="filterItems()">
+                </div>
+
+                <div class="items-grid" id="itemsContainer">
+                    <!-- Gli elementi verranno inseriti qui dinamicamente -->
+                </div>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-state-icon">📜</div>
+                    <h3>Nessun elemento trovato</h3>
+                    <p>Inizia scrivendo nel tuo diario vintage!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per aggiungere/modificare elementi -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Aggiungi Nuovo Elemento</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="itemForm">
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="itemType" onchange="updateFormFields()">
+                        <option value="todo">✅ Cosa da Fare</option>
+                        <option value="note">📝 Appunto</option>
+                        <option value="list">📄 Lista Numerata</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Titolo</label>
+                    <input type="text" class="form-input" id="itemTitle" placeholder="Inserisci il titolo..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contenuto</label>
+                    <textarea class="form-input form-textarea" id="itemContent" placeholder="Inserisci il contenuto... (Per le liste, scrivi ogni elemento su una riga separata)"></textarea>
+                </div>
+
+                <div class="form-group" id="priorityGroup">
+                    <label class="form-label">Priorità</label>
+                    <select class="form-select" id="itemPriority">
+                        <option value="low">🟢 Bassa</option>
+                        <option value="medium">🟡 Media</option>
+                        <option value="high">🔴 Alta</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class AgendaApp {
+            constructor() {
+                this.items = JSON.parse(localStorage.getItem('agendaItems')) || [];
+                this.currentCategory = 'all';
+                this.editingId = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.updateDate();
+                this.setupEventListeners();
+                this.renderItems();
+                this.updateStats();
+            }
+
+            updateDate() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                document.getElementById('currentDate').textContent = 
+                    now.toLocaleDateString('it-IT', options);
+            }
+
+            setupEventListeners() {
+                // Category buttons
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveCategory(e.target.dataset.category);
+                    });
+                });
+
+                // Form submission
+                document.getElementById('itemForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveItem();
+                });
+
+                // Modal close on outside click
+                document.getElementById('itemModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'itemModal') {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            setActiveCategory(category) {
+                this.currentCategory = category;
+                
+                // Update active button
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-category="${category}"]`).classList.add('active');
+                
+                // Update title
+                const titles = {
+                    all: '📋 Tutti gli elementi',
+                    todo: '✅ Cose da Fare',
+                    note: '📝 Appunti',
+                    list: '📄 Liste Numerate'
+                };
+                document.getElementById('contentTitle').textContent = titles[category];
+                
+                this.renderItems();
+            }
+
+            openModal(mode, itemId = null) {
+                this.editingId = itemId;
+                const modal = document.getElementById('itemModal');
+                const title = document.getElementById('modalTitle');
+                
+                if (mode === 'add') {
+                    title.textContent = 'Aggiungi Nuovo Elemento';
+                    this.resetForm();
+                } else {
+                    title.textContent = 'Modifica Elemento';
+                    this.loadItemForEdit(itemId);
+                }
+                
+                modal.classList.add('show');
+            }
+
+            closeModal() {
+                document.getElementById('itemModal').classList.remove('show');
+                this.resetForm();
+                this.editingId = null;
+            }
+
+            resetForm() {
+                document.getElementById('itemForm').reset();
+                document.getElementById('itemType').value = 'todo';
+                this.updateFormFields();
+            }
+
+            updateFormFields() {
+                const type = document.getElementById('itemType').value;
+                const priorityGroup = document.getElementById('priorityGroup');
+                
+                // Mostra priorità solo per todo
+                priorityGroup.style.display = type === 'todo' ? 'block' : 'none';
+            }
+
+            loadItemForEdit(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+                
+                document.getElementById('itemType').value = item.type;
+                document.getElementById('itemTitle').value = item.title;
+                document.getElementById('itemContent').value = item.content;
+                document.getElementById('itemPriority').value = item.priority || 'medium';
+                
+                this.updateFormFields();
+            }
+
+            saveItem() {
+                const type = document.getElementById('itemType').value;
+                const title = document.getElementById('itemTitle').value.trim();
+                const content = document.getElementById('itemContent').value.trim();
+                const priority = document.getElementById('itemPriority').value;
+                
+                if (!title) {
+                    alert('⚠️ Il titolo è obbligatorio!');
+                    return;
+                }
+                
+                const item = {
+                    id: this.editingId || Date.now().toString(),
+                    type,
+                    title,
+                    content,
+                    priority: type === 'todo' ? priority : null,
+                    completed: false,
+                    createdAt: this.editingId ? 
+                        this.items.find(i => i.id === this.editingId).createdAt : 
+                        new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                if (this.editingId) {
+                    const index = this.items.findIndex(i => i.id === this.editingId);
+                    this.items[index] = { ...this.items[index], ...item };
+                } else {
+                    this.items.unshift(item);
+                }
+                
+                this.saveToStorage();
+                this.renderItems();
+                this.updateStats();
+                this.closeModal();
+                
+                const action = this.editingId ? 'modificato' : 'aggiunto';
+                this.showNotification(`✅ Elemento ${action} con successo!`);
+            }
+
+            deleteItem(itemId) {
+                if (!confirm('🗑️ Sei sicuro di voler eliminare questo elemento?')) {
+                    return;
+                }
+                
+                this.items = this.items.filter(item => item.id !== itemId);
+                this.saveToStorage();
+                this.renderItems();
+                this.updateStats();
+                this.showNotification('🗑️ Elemento eliminato!');
+            }
+
+            toggleComplete(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (item) {
+                    item.completed = !item.completed;
+                    item.updatedAt = new Date().toISOString();
+                    this.saveToStorage();
+                    this.renderItems();
+                    this.updateStats();
+                }
+            }
+
+            renderItems() {
+                const container = document.getElementById('itemsContainer');
+                const emptyState = document.getElementById('emptyState');
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                let filteredItems = this.items;
+                
+                // Filter by category
+                if (this.currentCategory !== 'all') {
+                    filteredItems = filteredItems.filter(item => item.type === this.currentCategory);
+                }
+                
+                // Filter by search
+                if (searchTerm) {
+                    filteredItems = filteredItems.filter(item => 
+                        item.title.toLowerCase().includes(searchTerm) ||
+                        item.content.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                if (filteredItems.length === 0) {
+                    container.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                container.style.display = 'grid';
+                emptyState.style.display = 'none';
+                
+                container.innerHTML = filteredItems.map(item => this.renderItemCard(item)).join('');
+            }
+
+            renderItemCard(item) {
+                const date = new Date(item.createdAt).toLocaleDateString('it-IT');
+                const priorityClass = item.priority ? `priority-${item.priority}` : '';
+                const priorityText = {
+                    high: '🔴 Alta',
+                    medium: '🟡 Media',
+                    low: '🟢 Bassa'
+                };
+                
+                const typeIcons = {
+                    todo: '✅',
+                    note: '📝',
+                    list: '📄'
+                };
+                
+                return `
+                    <div class="item-card ${item.type} ${item.completed ? 'completed' : ''}">
+                        <div class="item-header">
+                            <div class="item-title">
+                                ${typeIcons[item.type]} ${item.title}
+                            </div>
+                            <div class="item-actions">
+                                ${item.type === 'todo' ? `
+                                    <button class="action-btn" onclick="app.toggleComplete('${item.id}')" title="Segna come ${item.completed ? 'da fare' : 'completato'}">
+                                        ${item.completed ? '↩️' : '✅'}
+                                    </button>
+                                ` : ''}
+                                <button class="action-btn" onclick="app.openModal('edit', '${item.id}')" title="Modifica">
+                                    ✏️
+                                </button>
+                                <button class="action-btn" onclick="app.deleteItem('${item.id}')" title="Elimina">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        
+                        ${item.content ? `
+                            <div class="item-content ${item.completed ? 'todo-text completed' : ''}">
+                                ${this.formatContent(item.content, item.type)}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="item-meta">
+                            <span>${date}</span>
+                            ${item.priority ? `<span class="${priorityClass}">${priorityText[item.priority]}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            formatContent(content, type) {
+                if (type === 'list') {
+                    // Converte le righe in lista numerata automatica
+                    const lines = content.split('\n').filter(line => line.trim());
+                    return `<div class="ordered-list">${lines.map(line => `<div class="list-item">${line.trim()}</div>`).join('')}</div>`;
+                }
+                
+                return content.replace(/\n/g, '<br>');
+            }
+
+            filterItems() {
+                this.renderItems();
+            }
+
+            updateStats() {
+                const total = this.items.length;
+                const completed = this.items.filter(item => item.completed).length;
+                const pending = total - completed;
+                
+                document.getElementById('totalItems').textContent = total;
+                document.getElementById('completedItems').textContent = completed;
+                document.getElementById('pendingItems').textContent = pending;
+            }
+
+            saveToStorage() {
+                localStorage.setItem('agendaItems', JSON.stringify(this.items));
+            }
+
+            showNotification(message) {
+                // Semplice alert per ora, si può migliorare con toast
+                setTimeout(() => alert(message), 100);
+            }
+        }
+
+        // Inizializza l'app
+        const app = new AgendaApp();
+
+        // Funzioni globali per i pulsanti
+        function openModal(mode, itemId) {
+            app.openModal(mode, itemId);
+        }
+
+        function closeModal() {
+            app.closeModal();
+        }
+
+        function updateFormFields() {
+            app.updateFormFields();
+        }
+
+        function filterItems() {
+            app.filterItems();
+        }
+
+        // Aggiorna la data ogni minuto
+        setInterval(() => app.updateDate(), 60000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97561d965419ee9b',t:'MTc1NjI0MDUyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
