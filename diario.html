@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Il Mio Diario Scolastico</title>
     <style>
         body {
@@ -385,22 +385,24 @@
         }
 
         .schedule-table-container {
-            height: calc(100% - 80px);
-            overflow: auto;
-            border: 2px solid #A8DADC;
-            border-radius: 10px;
-            background: #FFFEF7;
-            max-height: 600px;
-        }
+    height: calc(100% - 80px);
+    overflow: auto; /* Questo permette di scorrere a destra e sinistra sul telefono */
+    border: 2px solid #A8DADC;
+    border-radius: 10px;
+    background: #FFFEF7;
+    max-height: 600px;
+    -webkit-overflow-scrolling: touch; /* Rende lo scorrimento fluido su iPhone */
+}
 
         .schedule-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Arial', sans-serif;
-            font-size: 12px;
-            table-layout: fixed;
-        }
-
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    /* Modifica queste due righe qui sotto: */
+    table-layout: auto; 
+    min-width: 700px; 
+}
         .schedule-table th {
             background: linear-gradient(90deg, #E9F5F5, #D1ECEC);
             color: #1B4332;
@@ -437,17 +439,17 @@
         }
 
         .subject-cell {
-            background: #FFFEF7;
-            min-height: 30px;
-            height: 30px;
-            cursor: text;
-            transition: all 0.2s;
-            outline: none;
-            font-family: 'Arial', sans-serif;
-            font-size: 11px;
-            color: #2C3E50;
-            width: calc((100% - 80px) / 6);
-        }
+    background: #FFFEF7;
+    cursor: text;
+    transition: all 0.2s;
+    outline: none;
+    font-family: 'Arial', sans-serif;
+    color: #2C3E50;
+    /* Aggiungi/Modifica queste tre righe: */
+    height: 50px;       /* Più alta per scriverci bene col dito */
+    min-width: 100px;   /* Impedisce ai quadrati di diventare mini */
+    font-size: 13px;    /* Testo leggermente più grande */
+}
 
         .subject-cell:hover {
             background: #F8F9FA;
@@ -493,6 +495,73 @@
                 opacity: 0;
             }
         }
+/* --- FIX PER MOBILE (Smartphone e Tablet) --- */
+@media (max-width: 768px) {
+    /* 1. Il contenitore principale occupa più spazio */
+    .diary-book {
+        height: 95vh;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* 2. I tasti in alto (Settimane, Nuova, Elimina, Chiudi) */
+    .page-header {
+        flex-direction: column; /* Li mette uno sotto l'altro */
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .page-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Crea una griglia 2x2 per i bottoni */
+        gap: 5px;
+    }
+
+    .control-btn {
+        padding: 10px 5px;
+        font-size: 11px; /* Leggermente più piccoli per stare nei bordi */
+        text-align: center;
+    }
+
+    /* 3. La barra degli strumenti (Penne e Colori) */
+    .drawing-toolbar {
+        display: flex;
+        flex-wrap: nowrap; /* Impedisce di andare a capo */
+        overflow-x: auto;  /* Permette di scorrere i colori col dito */
+        -webkit-overflow-scrolling: touch;
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .tool-section {
+        flex-shrink: 0; /* Impedisce ai cerchietti dei colori di schiacciarsi */
+        display: flex;
+        align-items: center;
+    }
+
+    /* 4. Le Tab (Orario, Compiti, Note) */
+    .section-tabs {
+        display: flex;
+        justify-content: space-around;
+        padding: 5px;
+    }
+
+    .tab-btn {
+        padding: 8px 5px;
+        font-size: 12px;
+        flex: 1; /* Divide lo spazio equamente tra i 3 tasti */
+    }
+
+    /* 5. La Tabella */
+    .schedule-table {
+        min-width: 800px; /* La tabella resta larga e leggibile */
+    }
+
+    .schedule-table-container {
+        overflow-x: auto; /* Puoi scorrere la tabella a destra e sinistra */
+    }
+}
     </style>
 </head>
 <body>
@@ -739,8 +808,7 @@
             </div>
         </div>
     </div>
-
-    <script>
+ <script>
         let weeks = JSON.parse(localStorage.getItem('schoolWeeks')) || [];
         let currentWeekIndex = 0;
         let currentSection = 'schedule';
