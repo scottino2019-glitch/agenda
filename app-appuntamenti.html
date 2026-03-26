@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Calendario Appuntamenti</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Pacifico&family=Righteous&family=Staatliches&family=Bungee+Inline&family=Fredoka+One&family=Lobster&family=Permanent+Marker&family=Russo+One&family=Audiowide&family=Black+Ops+One&family=Creepster&family=Fascinate&family=Monoton&family=Orbitron:wght@900&family=Press+Start+2P&family=Rubik+Mono+One&family=Special+Elite&family=Wallpoet&family=Zilla+Slab+Highlight:wght@700&display=swap" rel="stylesheet">
+<style>
+.text-content {
+            font-size: 40px;
+            color: black;
+            font-weight: 700;
+            font-family: 'Audiowide', cursive;
+            text-align: center;
+        }
+  #month-year { 
+font-family: 'Pacifico', cursive;
+            font-size: 25px;
+            color: #ff0000;
+            font-weight: 600;
+        }
+
+        
+        
+
+        th {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 13px;
+            color: blue;
+            font-weight: 500;
+     }
+#calendar-body {
+      font-family: 'Permanent Marker', cursive;
+            
+}
+   #day-title {
+font-family: 'Pacifico', cursive;
+            font-size: 20px;
+            color: #ff0000;
+            font-weight: 500;
+}
+#add-event-btn {
+font-family: 'Pacifico', cursive;
+            font-size: 16px;
+            color: white;
+            font-weight: 400;
+}
+</style>
+    
+
+  </head>
+ <body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen py-8">
+  
+<div class="text-content">🗓️Appuntamenti</div>
+<br><hr>
+    <div class="flex items-center justify-center px-4">
+      <div class="max-w-sm w-full shadow-2xl rounded-2xl overflow-hidden" id="calendar-container">
+        <!-- Header Mese -->
+        <div class="p-6 dark:bg-gray-800 bg-white">
+          <div class="flex items-center justify-between mb-6">
+            <span id="month-year" class="text-2xl font-bold dark:text-gray-100 text-gray-800">Gennaio 2026</span>
+            <div class="flex items-center gap-2">
+              <button id="prev-month" class="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button id="next-month" class="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Griglia Giorni -->
+          <div class="overflow-x-auto">
+            <table class="w-full" id="calendar-table">
+              <thead class="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                <tr>
+                  <th class="p-2 text-center">Lun</th><th class="p-2 text-center">Mar</th><th class="p-2 text-center">Mer</th>
+                  <th class="p-2 text-center">Gio</th><th class="p-2 text-center">Ven</th><th class="p-2 text-center">Sab</th><th class="p-2 text-center">Dom</th>
+                </tr>
+              </thead>
+              <tbody id="calendar-body">
+                <!-- Generato dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Appuntamenti Giorno + Nuovo -->
+        <div class="p-3 dark:bg-gray-700 bg-gray-50 border-t">
+          <div class="flex justify-between items-center mb-2">
+            <h3 id="day-title" class="font-bold text-lg dark:text-gray-100 text-gray-800">Seleziona una data</h3>
+            <button id="add-event-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 text-sm font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Nuovo
+            </button>
+          </div>
+          
+          <div id="events-list" class="space-y-4 max-h-64 overflow-y-auto">
+            <!-- Caricati dinamicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Appuntamento -->
+    <div id="event-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <h3 id="modal-title" class="text-2xl font-bold mb-6 dark:text-gray-100 text-gray-800">Nuovo Appuntamento</h3>
+        <form id="event-form">
+          <div class="mb-5">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ora</label>
+            <input type="time" id="event-time" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-lg dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" value="09:00">
+          </div>
+          <div class="mb-5">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Titolo</label>
+            <input type="text" id="event-title" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-lg dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="Es: Lezione Cinese">
+          </div>
+          <div class="mb-8">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Note</label>
+            <textarea id="event-desc" rows="3" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-lg dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-vertical" placeholder="Dettagli appuntamento..."></textarea>
+          </div>
+          <div class="flex gap-3 justify-end pt-2">
+            <button type="button" id="cancel-btn" class="px-8 py-3 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-400 transition-all font-medium">Annulla</button>
+            <button type="submit" class="px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-medium shadow-lg">Salva</button>
+            <button type="button" id="delete-btn" class="px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium shadow-lg hidden">Elimina</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let currentDate = new Date(); // Oggi reale
+        let selectedDate = null;
+        let editingEventId = null;
+        const monthNames = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+        
+        let events = JSON.parse(localStorage.getItem('calendarEvents')) || {};
+        
+        function saveEvents() {
+          localStorage.setItem('calendarEvents', JSON.stringify(events));
+        }
+        
+        function generateCalendar() {
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+          const firstDay = new Date(year, month, 1);
+          const firstDayWeekday = firstDay.getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const todayKey = new Date().toISOString().split('T')[0];
+          
+          const firstDayIndex = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+          
+          document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
+          
+          let tbody = document.getElementById('calendar-body');
+          tbody.innerHTML = '';
+          
+          for (let row = 0; row < 6; row++) {
+            let tr = document.createElement('tr');
+            for (let col = 0; col < 7; col++) {
+              let td = document.createElement('td');
+              const totalCells = row * 7 + col;
+              const dateNum = totalCells - firstDayIndex + 1;
+              
+              if (dateNum > 0 && dateNum <= daysInMonth) {
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(dateNum).padStart(2, '0')}`;
+                let div = document.createElement('div');
+                div.className = 'group p-2 cursor-pointer flex w-full justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all relative shadow-sm hover:shadow-md h-10 items-center';
+                div.dataset.date = dateKey;
+                
+                let p = document.createElement('p');
+                p.className = 'text-lg font-semibold text-gray-700 dark:text-gray-200';
+                p.textContent = dateNum;
+                
+                const dayEvents = events[dateKey] || [];
+                if (dayEvents.length > 0) {
+                  let badge = document.createElement('span');
+                  badge.className = 'absolute -top-1 -right-1 bg-indigo-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-lg';
+                  badge.textContent = dayEvents.length;
+                  div.appendChild(badge);
+                }
+                
+                if (dateKey === todayKey) {
+                  div.className += ' bg-gradient-to-br from-indigo-400 to-blue-500 text-white shadow-lg ring-4 ring-indigo-200 dark:ring-indigo-800';
+                  p.className = 'text-white font-bold drop-shadow-md';
+                } else if (selectedDate === dateKey) {
+                  div.className += ' bg-indigo-200 dark:bg-indigo-800 ring-4 ring-indigo-400 shadow-xl';
+                }
+                
+                div.appendChild(p);
+                
+                // Click = mostra eventi, dblclick = nuovo
+                div.addEventListener('click', () => {
+                  selectedDate = dateKey;
+                  document.getElementById('day-title').textContent = `Appuntamenti ${dateNum}/${month+1}`;
+                  generateCalendar();
+                  loadEvents(dateKey);
+                });
+                
+                div.addEventListener('dblclick', () => openModal(dateKey));
+                
+                td.appendChild(div);
+              } else {
+                td.innerHTML = '<div class="p-3 h-20 invisible"></div>';
+              }
+              tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+          }
+        }
+        
+        function loadEvents(dateKey) {
+          const dayEvents = events[dateKey] || [];
+          const eventsList = document.getElementById('events-list');
+          const dayTitle = document.getElementById('day-title');
+          
+          if (!dateKey) {
+            eventsList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8 text-lg italic">Clicca su una data per vedere gli appuntamenti</p>';
+            dayTitle.textContent = 'Seleziona una data';
+            return;
+          }
+          
+          if (dayEvents.length === 0) {
+            eventsList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8 text-lg">Nessun appuntamento questo giorno ✨</p>';
+            return;
+          }
+          
+          eventsList.innerHTML = dayEvents.map((evt, id) => `
+            <div class="group bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md border-l-4 border-indigo-500 transition-all">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <h4 class="font-bold text-lg dark:text-gray-100 text-gray-800">${evt.title}</h4>
+                  <p class="text-indigo-600 font-semibold text-sm">${evt.time}</p>
+                </div>
+                <button onclick="editEvent('${dateKey}', ${id})" class="p-2 hover:bg-indigo-100 dark:hover:bg-indigo-900 rounded-full transition-all opacity-0 group-hover:opacity-100">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+              </div>
+              <p class="text-gray-600 dark:text-gray-300">${evt.desc}</p>
+            </div>
+          `).join('');
+        }
+        
+        // Modal functions (invariate ma migliorate)
+        const modal = document.getElementById('event-modal');
+        const form = document.getElementById('event-form');
+        
+        function openModal(dateKey, eventId = null) {
+          selectedDate = dateKey;
+          editingEventId = eventId;
+          document.getElementById('event-time').value = eventId !== null ? (events[dateKey]?.[eventId]?.time || '') : '09:00';
+          document.getElementById('event-title').value = eventId !== null ? (events[dateKey]?.[eventId]?.title || '') : '';
+          document.getElementById('event-desc').value = eventId !== null ? (events[dateKey]?.[eventId]?.desc || '') : '';
+          document.getElementById('modal-title').textContent = eventId !== null ? 'Modifica Appuntamento' : 'Nuovo Appuntamento';
+          document.getElementById('delete-btn').classList.toggle('hidden', eventId === null);
+          modal.classList.remove('hidden');
+        }
+        
+        document.getElementById('cancel-btn').onclick = () => modal.classList.add('hidden');
+        
+        form.onsubmit = function(e) {
+          e.preventDefault();
+          const time = document.getElementById('event-time').value;
+          const title = document.getElementById('event-title').value.trim();
+          const desc = document.getElementById('event-desc').value.trim();
+          
+          if (!title) return alert('Inserisci un titolo!');
+          
+          if (!events[selectedDate]) events[selectedDate] = [];
+          
+          if (editingEventId !== null) {
+            events[selectedDate][editingEventId] = { time, title, desc };
+          } else {
+            events[selectedDate].push({ time, title, desc });
+          }
+          
+          saveEvents();
+          generateCalendar();
+          loadEvents(selectedDate);
+          modal.classList.add('hidden');
+        };
+        
+        document.getElementById('delete-btn').onclick = function() {
+          if (events[selectedDate]?.[editingEventId]) {
+            events[selectedDate].splice(editingEventId, 1);
+            if (events[selectedDate].length === 0) delete events[selectedDate];
+            saveEvents();
+            generateCalendar();
+            loadEvents(selectedDate);
+            modal.classList.add('hidden');
+          }
+        };
+        
+        window.editEvent = (dateKey, eventId) => openModal(dateKey, eventId);
+        
+        // Navigazione
+        document.getElementById('prev-month').onclick = () => {
+          currentDate.setMonth(currentDate.getMonth() - 1);
+          generateCalendar();
+          loadEvents('');
+        };
+        document.getElementById('next-month').onclick = () => {
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          generateCalendar();
+          loadEvents('');
+        };
+        
+        // Bottone Nuovo
+        document.getElementById('add-event-btn').onclick = () => {
+          if (!selectedDate) return alert('Prima seleziona una data!');
+          openModal(selectedDate);
+        };
+        
+        // Inizializza
+        generateCalendar();
+        loadEvents('');
+      });
+    </script>
+  </body>
+</html>

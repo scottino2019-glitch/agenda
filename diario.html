@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Mio Diario Scolastico</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1B4332, #2D6A4F);
+            font-family: 'Georgia', serif;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diary-book {
+            width: 95%;
+            max-width: 1200px;
+            height: 750px;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .diary-cover {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1B4332, #2D6A4F);
+            border: 5px solid #081C15;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.8s;
+            transform-origin: left center;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #F1FAEE;
+        }
+
+        .diary-cover.opened {
+            transform: rotateY(-180deg);
+        }
+
+        .cover-title {
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+        }
+
+        .cover-subtitle {
+            font-size: 18px;
+            font-style: italic;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .cover-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .school-year {
+            background: rgba(241, 250, 238, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .diary-pages {
+            width: 100%;
+            height: 100%;
+            background: #FFFEF7;
+            border: 3px solid #A8DADC;
+            border-radius: 10px;
+            position: relative;
+            display: none;
+            overflow: hidden;
+        }
+
+        .diary-pages.active {
+            display: block;
+        }
+
+        .page-header {
+            background: linear-gradient(90deg, #E9F5F5, #D1ECEC);
+            padding: 15px 20px;
+            border-bottom: 2px solid #A8DADC;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-date {
+            font-size: 18px;
+            color: #1B4332;
+            font-weight: bold;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: #457B9D;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #1D3557;
+            transform: scale(1.05);
+        }
+
+        .section-tabs {
+            background: #F1FAEE;
+            padding: 10px 20px;
+            border-bottom: 2px solid #A8DADC;
+            display: flex;
+            gap: 15px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #1B4332;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #457B9D;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #A8DADC;
+        }
+
+        .page-content {
+            height: calc(100% - 160px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            height: 100%;
+            padding: 20px;
+            background: 
+                linear-gradient(90deg, #E8E8E8 1px, transparent 1px),
+                linear-gradient(#E8E8E8 1px, transparent 1px);
+            background-size: 25px 30px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .drawing-toolbar {
+            background: rgba(241, 250, 238, 0.9);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            border: 2px solid #A8DADC;
+        }
+
+        .tool-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool-label {
+            font-size: 12px;
+            color: #1B4332;
+            font-weight: bold;
+        }
+
+        .tool-btn {
+            background: #457B9D;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover, .tool-btn.active {
+            background: #1D3557;
+            transform: scale(1.05);
+        }
+
+        .color-picker {
+            width: 25px;
+            height: 25px;
+            border: 2px solid #1B4332;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-picker:hover, .color-picker.active {
+            transform: scale(1.2);
+            border-width: 3px;
+        }
+
+        .size-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #1B4332;
+            background: #F1FAEE;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover, .size-btn.active {
+            background: #A8DADC;
+            transform: scale(1.1);
+        }
+
+        .canvas-container {
+            position: relative;
+            height: calc(100% - 80px);
+            background: #FFFEF7;
+            border: 2px solid #A8DADC;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .schedule-canvas {
+            background-image: 
+                linear-gradient(90deg, #E8E8E8 1px, transparent 1px),
+                linear-gradient(#E8E8E8 1px, transparent 1px);
+            background-size: 25px 30px;
+        }
+
+        .homework-canvas {
+            background-image: 
+                linear-gradient(90deg, #FFE5E5 1px, transparent 1px),
+                linear-gradient(#FFE5E5 1px, transparent 1px);
+            background-size: 25px 30px;
+        }
+
+        .notes-canvas {
+            background-image: 
+                linear-gradient(90deg, #E5F3FF 1px, transparent 1px),
+                linear-gradient(#E5F3FF 1px, transparent 1px);
+            background-size: 25px 30px;
+        }
+
+        #drawingCanvas {
+            display: block;
+            cursor: crosshair;
+            width: 100%;
+            height: 100%;
+        }
+
+        #drawingCanvas.eraser-mode {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="8" width="16" height="8" rx="2" fill="%23FF6B6B"/><rect x="4" y="6" width="12" height="4" rx="1" fill="%23FFE66D"/></svg>') 10 10, auto;
+        }
+
+        .canvas-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #BDC3C7;
+            font-style: italic;
+            font-size: 18px;
+            pointer-events: none;
+            opacity: 0.5;
+            text-align: center;
+        }
+
+        .page-navigation {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: #1B4332;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #2D6A4F;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:disabled {
+            background: #BDC3C7;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            background: #F1FAEE;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #1B4332;
+            border: 1px solid #A8DADC;
+        }
+
+        .week-selector {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(241, 250, 238, 0.95);
+            border: 2px solid #A8DADC;
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+            z-index: 5;
+            min-width: 200px;
+        }
+
+        .week-selector.show {
+            display: block;
+        }
+
+        .week-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            border-left: 4px solid #457B9D;
+            transition: all 0.2s;
+        }
+
+        .week-item:hover {
+            background: #F0F0F0;
+            transform: translateX(5px);
+        }
+
+        .schedule-table-container {
+            height: calc(100% - 80px);
+            overflow: auto;
+            border: 2px solid #A8DADC;
+            border-radius: 10px;
+            background: #FFFEF7;
+            max-height: 600px;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        .schedule-table th {
+            background: linear-gradient(90deg, #E9F5F5, #D1ECEC);
+            color: #1B4332;
+            font-weight: bold;
+            padding: 8px 4px;
+            text-align: center;
+            border: 1px solid #A8DADC;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-size: 11px;
+        }
+
+        .schedule-table td {
+            border: 1px solid #A8DADC;
+            padding: 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .time-slot {
+            background: #F1FAEE;
+            color: #1B4332;
+            font-weight: bold;
+            font-size: 10px;
+            width: 80px;
+            min-width: 80px;
+            padding: 6px 2px;
+        }
+
+        .time-slot.break {
+            background: #FFE5CC;
+            color: #8B4513;
+        }
+
+        .subject-cell {
+            background: #FFFEF7;
+            min-height: 30px;
+            height: 30px;
+            cursor: text;
+            transition: all 0.2s;
+            outline: none;
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            color: #2C3E50;
+            width: calc((100% - 80px) / 6);
+        }
+
+        .subject-cell:hover {
+            background: #F8F9FA;
+            box-shadow: inset 0 0 5px rgba(69, 123, 157, 0.3);
+        }
+
+        .subject-cell:focus {
+            background: #FFF;
+            box-shadow: inset 0 0 8px rgba(69, 123, 157, 0.5);
+            border: 2px solid #457B9D;
+        }
+
+        .break-row {
+            background: #FFF8E1;
+        }
+
+        .break-cell {
+            background: #FFE5CC;
+            color: #8B4513;
+            font-weight: bold;
+            font-style: italic;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-book">
+        <!-- Copertina -->
+        <div class="diary-cover" id="diaryCover" onclick="openDiary()">
+            <div class="cover-icon">📚</div>
+            <div class="cover-title">Il Mio Diario Scolastico</div>
+            <div class="cover-subtitle">Orari • Compiti • Note</div>
+            <div class="school-year">Anno Scolastico 2024/2025</div>
+            <div style="font-size: 14px; margin-top: 20px;">Clicca per aprire...</div>
+        </div>
+
+        <!-- Pagine del diario -->
+        <div class="diary-pages" id="diaryPages">
+            <div class="page-header">
+                <div class="page-date" id="currentDate"></div>
+                <div class="page-controls">
+                    <button class="control-btn" onclick="toggleWeekSelector()">📅 Settimane</button>
+                    <button class="control-btn" onclick="newWeek()">📝 Nuova</button>
+                    <button class="control-btn" onclick="deleteCurrentWeek()" style="background: #E63946;">🗑️ Elimina</button>
+                    <button class="control-btn" onclick="closeDiary()">🔒 Chiudi</button>
+                </div>
+            </div>
+
+            <div class="section-tabs">
+                <button class="tab-btn active" onclick="switchSection('schedule')">📋 Orario</button>
+                <button class="tab-btn" onclick="switchSection('homework')">📝 Compiti</button>
+                <button class="tab-btn" onclick="switchSection('notes')">📖 Note</button>
+            </div>
+
+            <div class="page-content">
+                <!-- Sezione Orario -->
+                <div class="section active" id="schedule-section">
+                    <div class="drawing-toolbar">
+                        <div class="tool-section">
+                            <span class="tool-label">Strumenti:</span>
+                            <button class="tool-btn active" id="penTool" onclick="selectTool('pen')">✏️ Penna</button>
+                            <button class="tool-btn" id="eraserTool" onclick="selectTool('eraser')">🧽 Gomma</button>
+                        </div>
+                        
+                        <div class="tool-section">
+                            <span class="tool-label">Materie:</span>
+                            <div class="color-picker active" style="background-color: #E63946;" data-color="#E63946" title="Italiano"></div>
+                            <div class="color-picker" style="background-color: #2A9D8F;" data-color="#2A9D8F" title="Matematica"></div>
+                            <div class="color-picker" style="background-color: #264653;" data-color="#264653" title="Storia"></div>
+                            <div class="color-picker" style="background-color: #F4A261;" data-color="#F4A261" title="Scienze"></div>
+                            <div class="color-picker" style="background-color: #E76F51;" data-color="#E76F51" title="Inglese"></div>
+                            <div class="color-picker" style="background-color: #6A4C93;" data-color="#6A4C93" title="Arte"></div>
+                        </div>
+
+                        <div class="tool-section">
+                            <span class="tool-label">Dimensione:</span>
+                            <button class="size-btn active" data-size="2">S</button>
+                            <button class="size-btn" data-size="4">M</button>
+                            <button class="size-btn" data-size="6">L</button>
+                        </div>
+                    </div>
+
+                    <div class="schedule-table-container">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>Ora</th>
+                                    <th>Lunedì</th>
+                                    <th>Martedì</th>
+                                    <th>Mercoledì</th>
+                                    <th>Giovedì</th>
+                                    <th>Venerdì</th>
+                                    <th>Sabato</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td class="time-slot">10:00 - 11:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="1"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="1"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="1"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="1"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="1"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="1"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">11:00 - 12:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="2"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="2"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="2"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="2"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="2"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="2"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">12:00 - 13:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="3"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="3"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="3"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="3"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="3"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="3"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">13:00 - 14:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="4"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="4"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="4"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="4"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="4"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="4"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">14:00 - 15:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="5"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="5"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="5"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="5"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="5"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="5"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">15:00 - 16:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="6"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="6"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="6"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="6"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="6"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="6"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">16:00 - 17:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="7"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="7"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="7"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="7"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="7"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="7"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">17:00 - 18:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="8"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="8"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="8"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="8"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="8"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="8"></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-slot">18:00 - 19:00</td>
+                                    <td class="subject-cell" contenteditable="true" data-day="monday" data-hour="9"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="tuesday" data-hour="9"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="wednesday" data-hour="9"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="thursday" data-hour="9"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="friday" data-hour="9"></td>
+                                    <td class="subject-cell" contenteditable="true" data-day="saturday" data-hour="9"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+
+                <!-- Sezione Compiti -->
+                <div class="section" id="homework-section">
+                    <div class="drawing-toolbar">
+                        <div class="tool-section">
+                            <span class="tool-label">Strumenti:</span>
+                            <button class="tool-btn active" onclick="selectTool('pen')">✏️ Penna</button>
+                            <button class="tool-btn" onclick="selectTool('eraser')">🧽 Gomma</button>
+                        </div>
+                        
+                        <div class="tool-section">
+                            <span class="tool-label">Priorità:</span>
+                            <div class="color-picker active" style="background-color: #E63946;" data-color="#E63946" title="Urgente"></div>
+                            <div class="color-picker" style="background-color: #F4A261;" data-color="#F4A261" title="Importante"></div>
+                            <div class="color-picker" style="background-color: #2A9D8F;" data-color="#2A9D8F" title="Normale"></div>
+                            <div class="color-picker" style="background-color: #264653;" data-color="#264653" title="Fatto"></div>
+                        </div>
+
+                        <div class="tool-section">
+                            <span class="tool-label">Dimensione:</span>
+                            <button class="size-btn active" data-size="2">S</button>
+                            <button class="size-btn" data-size="4">M</button>
+                            <button class="size-btn" data-size="6">L</button>
+                        </div>
+                    </div>
+
+                    <div class="canvas-container homework-canvas">
+                        <canvas id="homeworkCanvas"></canvas>
+                        <div class="canvas-hint">
+                            Scrivi qui i tuoi compiti<br>
+                            <small>Usa i colori per indicare la priorità</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sezione Note -->
+                <div class="section" id="notes-section">
+                    <div class="drawing-toolbar">
+                        <div class="tool-section">
+                            <span class="tool-label">Strumenti:</span>
+                            <button class="tool-btn active" onclick="selectTool('pen')">✏️ Penna</button>
+                            <button class="tool-btn" onclick="selectTool('eraser')">🧽 Gomma</button>
+                        </div>
+                        
+                        <div class="tool-section">
+                            <span class="tool-label">Colori:</span>
+                            <div class="color-picker active" style="background-color: #264653;" data-color="#264653"></div>
+                            <div class="color-picker" style="background-color: #E63946;" data-color="#E63946"></div>
+                            <div class="color-picker" style="background-color: #2A9D8F;" data-color="#2A9D8F"></div>
+                            <div class="color-picker" style="background-color: #F4A261;" data-color="#F4A261"></div>
+                            <div class="color-picker" style="background-color: #E76F51;" data-color="#E76F51"></div>
+                            <div class="color-picker" style="background-color: #6A4C93;" data-color="#6A4C93"></div>
+                        </div>
+
+                        <div class="tool-section">
+                            <span class="tool-label">Dimensione:</span>
+                            <button class="size-btn active" data-size="2">S</button>
+                            <button class="size-btn" data-size="4">M</button>
+                            <button class="size-btn" data-size="6">L</button>
+                        </div>
+                    </div>
+
+                    <div class="canvas-container notes-canvas">
+                        <canvas id="notesCanvas"></canvas>
+                        <div class="canvas-hint">
+                            Scrivi qui le tue note personali<br>
+                            <small>Appunti, promemoria, pensieri...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-navigation">
+                <button class="nav-btn" id="prevBtn" onclick="previousWeek()" disabled>◀️</button>
+                <div class="page-indicator" id="pageIndicator">📆</div>
+                <button class="nav-btn" id="nextBtn" onclick="nextWeek()"> ➡️</button>
+            </div>
+
+            <!-- Selettore settimane -->
+            <div class="week-selector" id="weekSelector">
+                <h4 style="margin-top: 0; color: #1B4332;">Le mie settimane</h4>
+                <div id="weeksContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let weeks = JSON.parse(localStorage.getItem('schoolWeeks')) || [];
+        let currentWeekIndex = 0;
+        let currentSection = 'schedule';
+        let isOpen = false;
+        
+        // Variabili per il disegno
+        let canvases = {};
+        let contexts = {};
+        let isDrawing = false;
+        let currentTool = 'pen';
+        let currentColor = '#E63946';
+        let currentSize = 2;
+
+        // Inizializza il diario
+        function initDiary() {
+            if (weeks.length === 0) {
+                createNewWeek();
+            }
+            initCanvases();
+            updateCurrentDate();
+            loadCurrentWeek();
+            updateNavigation();
+            updateWeeksList();
+        }
+
+        // Inizializza i canvas per tutte le sezioni
+        function initCanvases() {
+            const sections = ['homework', 'notes'];
+            
+            sections.forEach(section => {
+                const canvas = document.getElementById(section + 'Canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvases[section] = canvas;
+                contexts[section] = ctx;
+                
+                // Imposta le dimensioni del canvas
+                resizeCanvas(section);
+                
+                // Eventi per il disegno
+                setupDrawingEvents(canvas, section);
+            });
+            
+            window.addEventListener('resize', () => {
+                sections.forEach(section => resizeCanvas(section));
+            });
+            
+            setupToolEvents();
+            setupScheduleEvents();
+        }
+
+        function resizeCanvas(section) {
+            const canvas = canvases[section];
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Ripristina il disegno se esiste
+            if (weeks[currentWeekIndex] && weeks[currentWeekIndex][section]) {
+                const img = new Image();
+                img.onload = function() {
+                    contexts[section].drawImage(img, 0, 0);
+                };
+                img.src = weeks[currentWeekIndex][section];
+            }
+            
+            // Imposta le proprietà del pennello
+            contexts[section].lineCap = 'round';
+            contexts[section].lineJoin = 'round';
+        }
+
+        // Apre il diario
+        function openDiary() {
+            if (isOpen) return;
+            isOpen = true;
+            
+            document.getElementById('diaryCover').classList.add('opened');
+            setTimeout(() => {
+                document.getElementById('diaryPages').classList.add('active');
+                initDiary();
+            }, 400);
+        }
+
+        // Chiude il diario
+        function closeDiary() {
+            isOpen = false;
+            document.getElementById('diaryPages').classList.remove('active');
+            document.getElementById('diaryCover').classList.remove('opened');
+            document.getElementById('weekSelector').classList.remove('show');
+        }
+
+        // Cambia sezione
+        function switchSection(section) {
+            // Aggiorna i tab
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mostra la sezione corretta
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(section + '-section').classList.add('active');
+            
+            currentSection = section;
+            
+            // Carica il disegno per questa sezione
+            loadSectionDrawing(section);
+        }
+
+        // Eventi per il disegno
+        function setupDrawingEvents(canvas, section) {
+            // Eventi mouse
+            canvas.addEventListener('mousedown', (e) => startDrawing(e, section));
+            canvas.addEventListener('mousemove', (e) => draw(e, section));
+            canvas.addEventListener('mouseup', () => stopDrawing(section));
+            canvas.addEventListener('mouseout', () => stopDrawing(section));
+
+            // Eventi touch per dispositivi mobili
+            canvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                startDrawing(e, section);
+            });
+            canvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                draw(e, section);
+            });
+            canvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                stopDrawing(section);
+            });
+        }
+
+        function setupToolEvents() {
+            // Gestione colori
+            document.querySelectorAll('.color-picker').forEach(picker => {
+                picker.addEventListener('click', function() {
+                    // Rimuovi active solo dai color picker nella stessa toolbar
+                    const toolbar = this.closest('.drawing-toolbar');
+                    toolbar.querySelectorAll('.color-picker').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    currentColor = this.dataset.color;
+                });
+            });
+
+            // Gestione dimensioni
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Rimuovi active solo dai size button nella stessa toolbar
+                    const toolbar = this.closest('.drawing-toolbar');
+                    toolbar.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSize = parseInt(this.dataset.size);
+                });
+            });
+        }
+
+        function startDrawing(e, section) {
+            isDrawing = true;
+            const canvas = canvases[section];
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            
+            contexts[section].beginPath();
+            contexts[section].moveTo(x, y);
+        }
+
+        function draw(e, section) {
+            if (!isDrawing) return;
+            
+            const canvas = canvases[section];
+            const ctx = contexts[section];
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            
+            if (currentTool === 'pen') {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentSize;
+            } else if (currentTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = currentSize * 2;
+            }
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function stopDrawing(section) {
+            if (isDrawing) {
+                isDrawing = false;
+                contexts[section].beginPath();
+                saveDrawing(section);
+            }
+        }
+
+        function selectTool(tool) {
+            currentTool = tool;
+            
+            // Aggiorna i pulsanti nella toolbar corrente
+            const activeSection = document.querySelector('.section.active');
+            const toolbar = activeSection.querySelector('.drawing-toolbar');
+            toolbar.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (tool === 'pen') {
+                toolbar.querySelector('.tool-btn').classList.add('active');
+            } else {
+                toolbar.querySelectorAll('.tool-btn')[1].classList.add('active');
+            }
+            
+            // Cambia il cursore per tutti i canvas
+            Object.values(canvases).forEach(canvas => {
+                if (tool === 'eraser') {
+                    canvas.classList.add('eraser-mode');
+                } else {
+                    canvas.classList.remove('eraser-mode');
+                }
+            });
+        }
+
+        function saveDrawing(section) {
+            if (weeks[currentWeekIndex]) {
+                weeks[currentWeekIndex][section] = canvases[section].toDataURL();
+                saveWeeks();
+            }
+        }
+
+        function loadSectionDrawing(section) {
+            if (section === 'schedule') {
+                loadScheduleData();
+                return;
+            }
+            
+            const canvas = canvases[section];
+            const ctx = contexts[section];
+            
+            // Pulisce il canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Carica il disegno se esiste
+            if (weeks[currentWeekIndex] && weeks[currentWeekIndex][section]) {
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = weeks[currentWeekIndex][section];
+            }
+        }
+
+        // Configura gli eventi per l'orario
+        function setupScheduleEvents() {
+            const cells = document.querySelectorAll('.subject-cell');
+            cells.forEach(cell => {
+                cell.addEventListener('input', saveScheduleData);
+                cell.addEventListener('blur', saveScheduleData);
+            });
+        }
+
+        // Salva i dati dell'orario
+        function saveScheduleData() {
+            if (!weeks[currentWeekIndex]) return;
+            
+            const scheduleData = {};
+            const cells = document.querySelectorAll('.subject-cell');
+            
+            cells.forEach(cell => {
+                const day = cell.dataset.day;
+                const hour = cell.dataset.hour;
+                const content = cell.textContent.trim();
+                
+                if (!scheduleData[day]) scheduleData[day] = {};
+                scheduleData[day][hour] = content;
+            });
+            
+            weeks[currentWeekIndex].schedule = scheduleData;
+            saveWeeks();
+        }
+
+        // Carica i dati dell'orario
+        function loadScheduleData() {
+            const cells = document.querySelectorAll('.subject-cell');
+            
+            // Pulisce tutte le celle
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            
+            // Carica i dati se esistono
+            if (weeks[currentWeekIndex] && weeks[currentWeekIndex].schedule) {
+                const scheduleData = weeks[currentWeekIndex].schedule;
+                
+                cells.forEach(cell => {
+                    const day = cell.dataset.day;
+                    const hour = cell.dataset.hour;
+                    
+                    if (scheduleData[day] && scheduleData[day][hour]) {
+                        cell.textContent = scheduleData[day][hour];
+                    }
+                });
+            }
+        }
+
+        // Crea una nuova settimana
+        function createNewWeek() {
+            const now = new Date();
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay() + 1); // Lunedì
+            
+            const week = {
+                id: Date.now(),
+                weekStart: weekStart.toLocaleDateString('it-IT'),
+                fullDate: `Settimana del ${weekStart.toLocaleDateString('it-IT')}`,
+                schedule: null,
+                homework: null,
+                notes: null,
+                timestamp: now.getTime()
+            };
+            weeks.unshift(week);
+            currentWeekIndex = 0;
+            saveWeeks();
+        }
+
+        // Nuova settimana
+        function newWeek() {
+            createNewWeek();
+            loadCurrentWeek();
+            updateNavigation();
+            updateWeeksList();
+            
+            // Pulisce tutti i canvas per la nuova settimana
+            Object.keys(canvases).forEach(section => {
+                contexts[section].clearRect(0, 0, canvases[section].width, canvases[section].height);
+            });
+            
+            // Pulisce anche l'orario
+            const cells = document.querySelectorAll('.subject-cell');
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+        }
+
+        // Elimina la settimana corrente
+        function deleteCurrentWeek() {
+            if (weeks.length <= 1) {
+                showMessage("Non puoi eliminare l'ultima settimana del diario!");
+                return;
+            }
+            
+            showDeleteConfirmation();
+        }
+
+        // Mostra conferma eliminazione
+        function showDeleteConfirmation() {
+            const confirmDiv = document.createElement('div');
+            confirmDiv.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            confirmDiv.innerHTML = `
+                <div style="
+                    background: #FFFEF7;
+                    padding: 30px;
+                    border-radius: 15px;
+                    border: 3px solid #A8DADC;
+                    text-align: center;
+                    max-width: 400px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                ">
+                    <h3 style="color: #1B4332; margin-top: 0;">🗑️ Elimina Settimana</h3>
+                    <p style="color: #2C3E50; margin: 20px 0;">Sei sicuro di voler eliminare questa settimana? Tutti i dati (orario, compiti e note) andranno persi.</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                        <button onclick="confirmDelete()" style="
+                            background: #E63946;
+                            color: white;
+                            border: none;
+                            padding: 12px 20px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            transition: all 0.2s;
+                        ">✓ Sì, Elimina</button>
+                        <button onclick="cancelDelete()" style="
+                            background: #95A5A6;
+                            color: white;
+                            border: none;
+                            padding: 12px 20px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            transition: all 0.2s;
+                        ">✗ Annulla</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmDiv);
+            window.currentConfirmDiv = confirmDiv;
+        }
+
+        // Conferma eliminazione
+        function confirmDelete() {
+            weeks.splice(currentWeekIndex, 1);
+            
+            if (currentWeekIndex >= weeks.length) {
+                currentWeekIndex = weeks.length - 1;
+            }
+            
+            saveWeeks();
+            loadCurrentWeek();
+            updateNavigation();
+            updateWeeksList();
+            
+            cancelDelete();
+            showMessage("Settimana eliminata con successo!", "#2ECC71");
+        }
+
+        // Annulla eliminazione
+        function cancelDelete() {
+            if (window.currentConfirmDiv) {
+                document.body.removeChild(window.currentConfirmDiv);
+                window.currentConfirmDiv = null;
+            }
+        }
+
+        // Mostra messaggio
+        function showMessage(message, color = "#E63946") {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${color};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-size: 14px;
+                z-index: 1001;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            document.body.removeChild(messageDiv);
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Aggiorna la data corrente
+        function updateCurrentDate() {
+            if (weeks[currentWeekIndex]) {
+                document.getElementById('currentDate').textContent = weeks[currentWeekIndex].fullDate;
+            }
+        }
+
+        // Carica la settimana corrente
+        function loadCurrentWeek() {
+            if (weeks[currentWeekIndex]) {
+                updateCurrentDate();
+                
+                // Carica il disegno per la sezione corrente
+                loadSectionDrawing(currentSection);
+            }
+        }
+
+        // Navigazione
+        function previousWeek() {
+            if (currentWeekIndex < weeks.length - 1) {
+                currentWeekIndex++;
+                loadCurrentWeek();
+                updateNavigation();
+            }
+        }
+
+        function nextWeek() {
+            if (currentWeekIndex > 0) {
+                currentWeekIndex--;
+                loadCurrentWeek();
+                updateNavigation();
+            }
+        }
+
+        // Aggiorna i pulsanti di navigazione
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            
+            prevBtn.disabled = currentWeekIndex >= weeks.length - 1;
+            nextBtn.disabled = currentWeekIndex <= 0;
+            
+            pageIndicator.textContent = `Week ${currentWeekIndex + 1} di ${weeks.length}`;
+        }
+
+        // Mostra/nasconde il selettore settimane
+        function toggleWeekSelector() {
+            const selector = document.getElementById('weekSelector');
+            selector.classList.toggle('show');
+        }
+
+        // Aggiorna la lista delle settimane
+        function updateWeeksList() {
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+            
+            weeks.forEach((week, index) => {
+                const item = document.createElement('div');
+                item.className = 'week-item';
+                item.onclick = () => goToWeek(index);
+                
+                const hasSchedule = (week.schedule && Object.keys(week.schedule).length > 0) ? '📋' : '';
+                const hasHomework = week.homework ? '📝' : '';
+                const hasNotes = week.notes ? '📖' : '';
+                
+                item.innerHTML = `
+                    <div><strong>${week.weekStart}</strong> ${hasSchedule} ${hasHomework} ${hasNotes}</div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Vai a una settimana specifica
+        function goToWeek(index) {
+            currentWeekIndex = index;
+            loadCurrentWeek();
+            updateNavigation();
+            document.getElementById('weekSelector').classList.remove('show');
+        }
+
+        // Salva le settimane nel localStorage
+        function saveWeeks() {
+            localStorage.setItem('schoolWeeks', JSON.stringify(weeks));
+        }
+
+        // Inizializza quando la pagina è caricata
+        window.addEventListener('load', () => {
+            // Il diario inizia chiuso
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'991255fce302ee54',t:'MTc2MDg5ODUxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="it" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Lavagna Brainstorming</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&amp;family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    .font-handwritten {
+      font-family: 'Caveat', cursive;
+    }
+    .font-main {
+      font-family: 'Quicksand', sans-serif;
+    }
+    .sticky-note {
+      cursor: grab;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+      touch-action: none;
+    }
+    .sticky-note:hover {
+      transform: scale(1.02) rotate(-1deg);
+    }
+    .sticky-note.dragging {
+      cursor: grabbing;
+      transform: scale(1.08) rotate(2deg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .note-yellow { background: linear-gradient(135deg, #fef08a 0%, #fde047 100%); }
+    .note-pink { background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%); }
+    .note-blue { background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%); }
+    .note-green { background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%); }
+    .note-orange { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
+    .board-bg {
+      background-color: #0f172a;
+      background-image: 
+        radial-gradient(circle, #1e293b 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .color-btn {
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .color-btn:active {
+      transform: scale(0.95);
+    }
+    .color-btn.selected {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 3px white, 0 4px 12px rgba(0,0,0,0.3);
+    }
+    @media (max-width: 640px) {
+      .sticky-note {
+        width: 140px !important;
+        min-height: 140px !important;
+        font-size: 16px;
+      }
+      .note-textarea {
+        font-size: 18px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full font-main">
+  <div id="app" class="h-full w-full flex flex-col board-bg overflow-hidden"><!-- Header -->
+   <header class="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 bg-slate-900/90 backdrop-blur-sm border-b border-slate-700 shrink-0">
+    <h1 id="board-title" class="text-xl sm:text-2xl font-bold text-white font-handwritten tracking-wide">💡 Brainstorming</h1>
+    <div class="flex items-center gap-2 sm:gap-3"><span id="note-count" class="text-slate-400 text-xs sm:text-sm">0 idee</span> <button id="clear-all-btn" class="px-2 sm:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-slate-300 text-xs sm:text-sm rounded-lg transition-colors"> 🗑️ Pulisci </button>
+    </div>
+   </header><!-- Toolbar -->
+   <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-3 sm:px-6 py-3 bg-slate-800/50 border-b border-slate-700 shrink-0">
+    <div class="flex items-center gap-3 w-full sm:w-auto justify-center"><span class="text-slate-400 text-xs sm:text-sm">Colore:</span>
+     <div class="flex gap-2 sm:gap-3"><button class="color-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full note-yellow selected border-2 border-slate-700" data-color="yellow"></button> <button class="color-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full note-pink border-2 border-slate-700" data-color="pink"></button> <button class="color-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full note-blue border-2 border-slate-700" data-color="blue"></button> <button class="color-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full note-green border-2 border-slate-700" data-color="green"></button> <button class="color-btn w-9 h-9 sm:w-10 sm:h-10 rounded-full note-orange border-2 border-slate-700" data-color="orange"></button>
+     </div>
+    </div><button id="add-note-btn" class="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-900 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
+     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+     </svg> Nuova Idea </button>
+   </div><!-- Board -->
+   <div id="board" class="flex-1 relative overflow-auto w-full"><!-- Notes will be added here -->
+    <div id="empty-state" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+     <div class="text-center px-4">
+      <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">
+       🧠
+      </div>
+      <p class="text-slate-400 text-base sm:text-lg font-medium">Clicca "Nuova Idea" per iniziare</p>
+      <p class="text-slate-500 text-xs sm:text-sm mt-2">Trascina le note per organizzarle</p>
+     </div>
+    </div>
+   </div><!-- Confirm Clear Modal -->
+   <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-800 rounded-xl p-5 sm:p-6 max-w-sm w-full mx-4 border border-slate-700 shadow-2xl">
+     <h3 class="text-white text-lg font-bold mb-2">Conferma eliminazione</h3>
+     <p class="text-slate-400 mb-6 text-sm">Vuoi eliminare tutte le idee dalla lavagna?</p>
+     <div class="flex gap-3 justify-end"><button id="cancel-clear" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-slate-300 rounded-lg transition-colors font-medium"> Annulla </button> <button id="confirm-clear" class="px-4 py-2 bg-red-500 hover:bg-red-400 active:bg-red-600 text-white rounded-lg transition-colors font-medium"> Elimina tutto </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    let notes = [];
+    let selectedColor = 'yellow';
+    let draggedNote = null;
+    let dragOffset = { x: 0, y: 0 };
+    let nextId = 1;
+
+    // DOM Elements
+    const board = document.getElementById('board');
+    const boardTitle = document.getElementById('board-title');
+    const noteCount = document.getElementById('note-count');
+    const emptyState = document.getElementById('empty-state');
+    const addNoteBtn = document.getElementById('add-note-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    const confirmModal = document.getElementById('confirm-modal');
+    const cancelClear = document.getElementById('cancel-clear');
+    const confirmClear = document.getElementById('confirm-clear');
+    const colorBtns = document.querySelectorAll('.color-btn');
+
+    // Load from localStorage
+    function loadNotes() {
+      const saved = localStorage.getItem('brainstorm-notes');
+      if (saved) {
+        try {
+          notes = JSON.parse(saved);
+          nextId = Math.max(...notes.map(n => parseInt(n.id)), 0) + 1;
+        } catch (e) {
+          notes = [];
+          nextId = 1;
+        }
+      }
+    }
+
+    function saveNotes() {
+      localStorage.setItem('brainstorm-notes', JSON.stringify(notes));
+    }
+
+    function updateEmptyState() {
+      emptyState.classList.toggle('hidden', notes.length > 0);
+      noteCount.textContent = `${notes.length} ${notes.length === 1 ? 'idea' : 'idee'}`;
+    }
+
+    function createNoteElement(note) {
+      const el = document.createElement('div');
+      el.className = `sticky-note note-${note.color} absolute p-3 sm:p-4 rounded-lg shadow-xl`;
+      el.style.width = '160px';
+      el.style.minHeight = '160px';
+      el.dataset.id = note.id;
+      el.style.left = `${note.x}px`;
+      el.style.top = `${note.y}px`;
+      
+      const dragHandle = document.createElement('div');
+      dragHandle.className = 'drag-handle absolute top-0 left-0 right-0 h-8 cursor-grab active:cursor-grabbing';
+      dragHandle.style.touchAction = 'none';
+      
+      const textarea = document.createElement('textarea');
+      textarea.className = 'note-textarea w-full bg-transparent resize-none outline-none text-slate-800 font-handwritten text-xl leading-relaxed placeholder-slate-600';
+      textarea.style.height = 'calc(100% - 8px)';
+      textarea.style.marginTop = '8px';
+      textarea.placeholder = 'Scrivi qui...';
+      textarea.value = note.text;
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-note absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-400 active:bg-red-600 text-white rounded-full flex items-center justify-center transition-all text-lg font-bold shadow-lg';
+      deleteBtn.innerHTML = '×';
+      
+      el.appendChild(dragHandle);
+      el.appendChild(textarea);
+      el.appendChild(deleteBtn);
+
+      // Drag events on handle
+      dragHandle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startDrag(e, el, note);
+      });
+
+      dragHandle.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        startDrag(touch, el, note);
+      }, { passive: false });
+
+      // Text change
+      textarea.addEventListener('input', () => {
+        note.text = textarea.value;
+        saveNotes();
+      });
+
+      // Delete button
+      deleteBtn.addEventListener('click', () => {
+        notes = notes.filter(n => n.id !== note.id);
+        saveNotes();
+        renderNotes();
+      });
+
+      return el;
+    }
+
+    function startDrag(e, el, note) {
+      draggedNote = { el, note };
+      const rect = el.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+      dragOffset = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      el.classList.add('dragging');
+    }
+
+    function handleDrag(e) {
+      if (!draggedNote) return;
+      e.preventDefault();
+      const clientX = e.clientX || e.touches?.[0]?.clientX;
+      const clientY = e.clientY || e.touches?.[0]?.clientY;
+      if (!clientX || !clientY) return;
+
+      const boardRect = board.getBoundingClientRect();
+      let x = clientX - boardRect.left - dragOffset.x + board.scrollLeft;
+      let y = clientY - boardRect.top - dragOffset.y + board.scrollTop;
+
+      x = Math.max(0, Math.min(x, board.scrollWidth - 160));
+      y = Math.max(0, Math.min(y, board.scrollHeight - 160));
+
+      draggedNote.el.style.left = `${x}px`;
+      draggedNote.el.style.top = `${y}px`;
+    }
+
+    function endDrag() {
+      if (!draggedNote) return;
+      draggedNote.el.classList.remove('dragging');
+
+      draggedNote.note.x = parseInt(draggedNote.el.style.left);
+      draggedNote.note.y = parseInt(draggedNote.el.style.top);
+      saveNotes();
+
+      draggedNote = null;
+    }
+
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', handleDrag, { passive: false });
+    document.addEventListener('touchend', endDrag);
+
+    // Color selection
+    colorBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedColor = btn.dataset.color;
+      });
+    });
+
+    // Add new note
+    addNoteBtn.addEventListener('click', () => {
+      const boardRect = board.getBoundingClientRect();
+      const isMobile = window.innerWidth < 640;
+      const noteSize = isMobile ? 140 : 160;
+      
+      // Calculate grid position to avoid overlap
+      const cols = Math.floor(boardRect.width / (noteSize + 20));
+      const noteIndex = notes.length;
+      const col = noteIndex % cols;
+      const row = Math.floor(noteIndex / cols);
+      
+      const newNote = {
+        id: (nextId++).toString(),
+        text: '',
+        x: 20 + col * (noteSize + 20),
+        y: 20 + row * (noteSize + 20),
+        color: selectedColor,
+        createdAt: Date.now()
+      };
+
+      notes.push(newNote);
+      saveNotes();
+      renderNotes();
+
+      // Focus on new note
+      setTimeout(() => {
+        const newEl = board.querySelector(`[data-id="${newNote.id}"] textarea`);
+        if (newEl) newEl.focus();
+      }, 100);
+    });
+
+    // Clear all
+    clearAllBtn.addEventListener('click', () => {
+      if (notes.length === 0) return;
+      confirmModal.classList.remove('hidden');
+    });
+
+    cancelClear.addEventListener('click', () => {
+      confirmModal.classList.add('hidden');
+    });
+
+    confirmClear.addEventListener('click', () => {
+      notes = [];
+      saveNotes();
+      renderNotes();
+      confirmModal.classList.add('hidden');
+    });
+
+    function renderNotes() {
+      board.querySelectorAll('.sticky-note').forEach(el => el.remove());
+      notes.forEach(note => {
+        board.appendChild(createNoteElement(note));
+      });
+      updateEmptyState();
+    }
+
+    // Initialize
+    loadNotes();
+    renderNotes();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bb48d5fc4a1ba8f',t:'MTc2Nzk2ODE4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
