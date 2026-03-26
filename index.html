@@ -3,251 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il Mio Organizer Personale</title>
+    <title>Organizer Pulito</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Permanent+Marker&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         :root {
-            --bg-table: #a67c52; 
-            --cover: #4e342e;    
-            --paper: #fffef0;    
-            --ink: #1a237e;      
-            --marker: #3e2723;
-            --pencil-color: #ffca28;
-            --eraser-color: #f48fb1;
+            --bg-table: #a67c52; --cover: #4e342e; --paper: #fffef0;
+            --ink: #1a237e; --marker: #3e2723;
         }
 
         body {
             background-color: var(--bg-table);
-            background-image: radial-gradient(rgba(0,0,0,0.1) 15%, transparent 20%);
-            background-size: 30px 30px;
             font-family: 'Indie Flower', cursive;
-            padding: 40px 20px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .hero {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-        }
-
         .hero h1 {
             font-family: 'Permanent Marker', cursive;
-            font-size: 3rem;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        /* STRUTTURA AGENDA APERTA */
         .agenda-book {
             background: var(--cover);
-            max-width: 1200px;
+            max-width: 1100px;
             width: 100%;
             display: flex;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-            position: relative;
-            gap: 60px;
-            min-height: 900px;
-        }
-
-        /* Spirale Centrale */
-        .agenda-book::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 40px;
-            bottom: 40px;
-            width: 40px;
-            transform: translateX(-50%);
-            background: linear-gradient(to right, 
-                transparent, 
-                #ddd 10%, #888 50%, #ddd 90%, 
-                transparent);
-            background-size: 100% 50px;
-            z-index: 10;
+            flex-direction: column; 
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            gap: 25px;
         }
 
         .page-column {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            z-index: 1;
+            gap: 30px;
         }
 
-        /* CARD (FOGLI) */
+        /* --- CARD CON LAYOUT FISSO --- */
         .card {
             background: var(--paper);
-            padding: 25px;
-            border-radius: 4px;
-            box-shadow: 3px 5px 15px rgba(0,0,0,0.2);
+            /* Aumentiamo il padding laterale per proteggere il testo dalle icone */
+            padding: 65px 20px 25px 20px; 
+            border-radius: 5px;
             position: relative;
-            min-height: 260px;
+            min-height: 250px;
             background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
             background-size: 100% 1.8rem;
             line-height: 1.8rem;
-            transition: transform 0.2s;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.2);
         }
 
-        .card:hover { transform: scale(1.02); }
-
-        .card h3 {
+        /* LINGUETTA: Fissa a SINISTRA per non sbattere contro i bottoni */
+        .tab {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 12px;
             font-family: 'Permanent Marker', cursive;
-            color: var(--marker);
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            border-bottom: 2px solid rgba(0,0,0,0.1);
+            color: white;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .card h3 i { margin-right: 10px; color: var(--cover); }
-
-        .card p {
-            font-size: 1.3rem;
-            color: var(--ink);
-            font-weight: bold;
-        }
-
-        /* BOTTONI MATITA E GOMMA */
+        /* BOTTONI: Fissi a DESTRA */
         .card-tools {
             position: absolute;
             top: 10px;
             right: 10px;
             display: flex;
             gap: 8px;
+            z-index: 5;
         }
 
         .btn-tool {
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            box-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+            width: 32px; height: 32px;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: underline; text-decoration-color: #000;
+            border: none; cursor: pointer;
+            box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
         }
+        .pencil { background: #ffca28; color: #333; }
+        .eraser { background: #f48fb1; color: #fff; }
 
-        .pencil { background: var(--pencil-color); color: #333; }
-        .eraser { background: var(--eraser-color); color: #fff; border-bottom: 2px solid #64b5f6; }
-
-        /* LINGUETTE (TABS) */
-        .tab {
-            position: absolute;
-            top: 15px;
-            padding: 5px 12px;
+        /* TITOLO: Pulito e centrato tra tab e bottoni */
+        .card h3 {
             font-family: 'Permanent Marker', cursive;
-            color: white;
-            font-size: 0.8rem;
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            color: var(--marker);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            text-align: center; /* Lo centrate per sicurezza */
         }
 
-        .left-col .tab { left: -15px; border-radius: 5px 0 0 5px; background: #d32f2f; }
-        .right-col .tab { right: -15px; border-radius: 0 5px 5px 0; background: #1976d2; }
+        .card p { color: var(--ink); font-weight: bold; font-size: 1.3rem; text-align: left; }
 
-        /* Colori dinamici per le linguette */
-        .card:nth-child(2) .tab { filter: hue-rotate(45deg); }
-        .card:nth-child(3) .tab { filter: hue-rotate(130deg); }
+        /* --- DESKTOP --- */
+        @media (min-width: 900px) {
+            .agenda-book {
+                flex-direction: row; 
+                padding: 40px;
+                gap: 50px;
+            }
 
-        /* RESPONSIVE */
-        @media (max-width: 950px) {
-            .agenda-book { flex-direction: column; gap: 20px; }
-            .agenda-book::after { display: none; }
-            .tab { left: 10px !important; right: auto !important; top: -15px !important; border-radius: 5px !important; }
+            .agenda-book::after {
+                content: ""; position: absolute; left: 50%; top: 20px; bottom: 20px;
+                width: 30px; transform: translateX(-50%);
+                background: linear-gradient(to right, transparent, #ddd 10%, #888 50%, #ddd 90%, transparent);
+                background-size: 100% 40px;
+            }
+
+            /* Solo su desktop le linguette sporgono un po' ma restano a SINISTRA */
+            .tab {
+                top: -12px;
+                left: 20px;
+                border-radius: 5px 5px 0 0;
+            }
         }
+
+        /* Colori Tab */
+        .c1 .tab { background: #d32f2f; }
+        .c2 .tab { background: #2e7d32; }
+        .c3 .tab { background: #f9a825; }
+        .c4 .tab { background: #1976d2; }
+        .c5 .tab { background: #8e24aa; }
+        .c6 .tab { background: #00838f; }
+
     </style>
 </head>
 <body>
 
     <header class="hero">
-        <h1><i class="fas fa-book-open"></i> Le Mie App</h1>
+        <h1>Organizer Personale</h1>
     </header>
 
     <main class="agenda-book">
-        
-        <div class="page-column left-col">
-            
-            <div class="card">
-                <div class="tab"><i class="fas fa-calendar-day"></i> PIANO</div>
+        <div class="page-column">
+            <div class="card c1">
+                <div class="tab"><i class="fas fa-calendar-alt"></i> PIANO</div>
                 <div class="card-tools">
-                    <a href="agenda.html" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
-                    
+                    <a class='btn-tool pencil' href='/agenda'><i class="fas fa-pencil-alt"></i></a>
+                  
                 </div>
                 <h3>Agenda</h3>
-                <p>Pianifica i tuoi obiettivi giornalieri e settimanali per non perdere il ritmo.</p>
+                <p>Pianifica i tuoi obiettivi giornalieri e settimanali per non perdere mai il ritmo delle tue attività.</p>
             </div>
 
-            <div class="card">
+            <div class="card c2">
                 <div class="tab"><i class="fas fa-sticky-note"></i> RAPIDO</div>
                 <div class="card-tools">
-                    <a href="blocknote.html" class="btn-tool pencil">
-        <i class="fas fa-pencil-alt"></i>
-    </a>
-                    
+                    <a class='btn-tool pencil' href='/blocknote'><i class="fas fa-pencil-alt"></i></a>
                 </div>
                 <h3>Blocknote</h3>
-                <p>Appunti veloci, liste della spesa o pensieri volanti da non dimenticare.</p>
+                <p>Appunti veloci, liste della spesa o pensieri volanti da catturare prima che svaniscano.</p>
             </div>
 
-            <div class="card">
+            <div class="card c3">
                 <div class="tab"><i class="fas fa-lightbulb"></i> IDEE</div>
                 <div class="card-tools">
-                    <a href="brainstorming.html" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
+                    <a class='btn-tool pencil' href='/brainstorming'><i class="fas fa-pencil-alt"></i></a>
                     
                 </div>
                 <h3>Brainstorming</h3>
-                <p>Mappe mentali e flussi di coscienza per i tuoi nuovi progetti creativi.</p>
+                <p>Mappe mentali e flussi di coscienza per dare vita ai tuoi nuovi ed entusiasmanti progetti creativi.</p>
             </div>
         </div>
 
-        <div class="page-column right-col">
-            
-            <div class="card">
+        <div class="page-column">
+            <div class="card c4">
                 <div class="tab"><i class="fas fa-book"></i> STUDIO</div>
                 <div class="card-tools">
-                    <a href="appunti.html" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
-                    
+                    <a class='btn-tool pencil' href='/appunti'><i class="fas fa-pencil-alt"></i></a>
+                    <a href="#" class="btn-tool eraser"><i class="fas fa-eraser"></i></a>
                 </div>
-                <h3>Appunti</h3>
-                <p>Lezioni, corsi e approfondimenti tecnici organizzati in modo ordinato.</p>
+                <h3>Quaderno Appunti</h3>
+                <p>Lezioni, corsi e approfondimenti tecnici organizzati in modo ordinato per una consultazione rapida.</p>
             </div>
 
-            <div class="card">
+            <div class="card c5">
                 <div class="tab"><i class="fas fa-pen-nib"></i> PRIVATO</div>
                 <div class="card-tools">
-                    <a href="diario.html" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
-                    
+                    <a href="diario" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
+                 
                 </div>
                 <h3>Diario Personale</h3>
-                <p>Uno spazio sicuro per riflettere sulla giornata e custodire i propri ricordi.</p>
+                <p>Uno spazio sicuro e intimo per riflettere sulla giornata trascorsa e custodire i tuoi ricordi più cari.</p>
             </div>
 
-            <div class="card">
+            <div class="card c6">
                 <div class="tab"><i class="fas fa-clock"></i> ORARI</div>
                 <div class="card-tools">
-                    <a href="appuntamenti.html" class="btn-tool pencil"><i class="fas fa-pencil-alt"></i></a>
-                    
+                    <a class='btn-tool pencil' href='/appuntamenti'><i class="fas fa-pencil-alt"></i></a>
+                   
                 </div>
                 <h3>Appuntamenti</h3>
-                <p>Gestione delle riunioni e degli incontri importanti per non arrivare mai in ritardo.</p>
+                <p>Gestione delle riunioni, incontri e scadenze importanti per essere sempre puntuale e organizzato.</p>
             </div>
         </div>
-
     </main>
 
 </body>
