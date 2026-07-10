@@ -145,14 +145,59 @@
         .c4 .tab { background: #1976d2; }
         .c5 .tab { background: #8e24aa; }
         .c6 .tab { background: #00838f; }
+.btn-circle {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+.btn-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%; /* Cerchio perfetto */
+  background: #e74c3c;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  animation: pulse-animation 2s infinite; /* Animazione continua */
+}
 
+.btn-circle:hover {
+  animation: none; /* Ferma l'animazione all'hover */
+  transform: scale(1.1);
+  background: #c0392b;
+}
+
+/* Keyframes per l'animazione pulsante */
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); /* L'ombra si espande e svanisce */
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
     </style>
 </head>
 <body>
 
     <header class="hero">
         <h1>Organizer Personale</h1>
+<button class="btn-circle">Ca</button>
     </header>
+<br>
 
     <main class="agenda-book">
 
